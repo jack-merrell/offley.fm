@@ -1,10 +1,8 @@
 # dependencies
 node_modules
-bower_components
 
 # compiled output
 /dist
-/.tmp
 
 # System Files
 .DS_Store
@@ -12,3 +10,7 @@ Thumbs.db
 
 # Local Netlify folder
 .netlify
+.vercel
+public/media/audio/original/
+media-originals/
+.venv/

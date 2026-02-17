@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/tune-station",
+      "destination": "/"
+    },
+    {
+      "source": "/tune-station/",
+      "destination": "/"
+    },
+    {
+      "source": "/all-stations",
+      "destination": "/"
+    },
+    {
+      "source": "/all-stations/",
+      "destination": "/"
+    }
+  ]
+}

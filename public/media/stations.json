@@ -1,0 +1,293 @@
+{
+  "stations": [
+    {
+      "id": "eves",
+      "frequency": "88.10",
+      "title": "Yuppie Favola Favourites",
+      "host": "Jay Fontaine",
+      "tags": [
+        "House",
+        "strictly vinyl",
+        "disco",
+        "groovy"
+      ],
+      "signal": 4,
+      "track": "/media/audio/128k/eves.mp3",
+      "art": "/media/artwork/eves.jpg",
+      "location": {
+        "lat": 51.507389,
+        "lon": -0.1275
+      },
+      "bpm": 123
+    },
+    {
+      "id": "claudio",
+      "frequency": "89.90",
+      "title": "VENICE 2.0",
+      "host": "Claudio",
+      "tags": [
+        "strictly vinyl",
+        "Ambient",
+        "House"
+      ],
+      "signal": 4,
+      "track": "/media/audio/128k/claudio.mp3",
+      "art": "/media/artwork/claudio.jpg",
+          "location": {
+        "lat": 52.3784231,
+        "lon": 4.9092013
+      },
+      "bpm": 120.3
+    },
+    {
+      "id": "emre",
+      "frequency": "90.50",
+      "title": "EILAND GASTEN- 54",
+      "host": "Superemre",
+      "tags": [
+        "techno",
+        "Trance"
+      ],
+      "signal": 2,
+      "track": "/media/audio/128k/emre.mp3",
+      "art": "/media/artwork/emre.jpg",
+      "location": {
+        "lat": 48.856694,
+        "lon": 2.352194
+      },
+      "bpm": 129.2
+    },
+    {
+      "id": "autumn",
+      "frequency": "91.19",
+      "title": "Autumn",
+      "host": "JAJ",
+      "tags": [
+        "House",
+        "techno",
+        "dub"
+      ],
+      "signal": 2,
+      "track": "/media/audio/128k/autumn.mp3",
+      "art": "/media/artwork/autumn.jpg",
+      "bpm": 129,
+      "location": {
+        "lat": 51.558267,
+        "lon": -0.07403
+      }
+    },
+    {
+      "id": "for15",
+      "frequency": "93.20",
+      "title": "For15",
+      "host": "Bobby Turner",
+      "tags": [
+        "House",
+        "groovy",
+        "disco"
+      ],
+      "signal": 3,
+      "track": "/media/audio/128k/for15.mp3",
+      "art": "/media/artwork/for15.jpg",
+      "location": {
+        "lat": 52.52,
+        "lon": 13.405056
+      },
+      "bpm": 123
+    },
+    {
+      "id": "feed",
+      "frequency": "95.05",
+      "title": "Feed Your Ears 001",
+      "host": "Feed Your Ears Crew",
+      "tags": [
+        "House",
+        "techno",
+        "disco",
+        "groovy",
+        "Trance"
+      ],
+      "signal": 3,
+      "track": "/media/audio/128k/feed.mp3",
+      "art": "/media/artwork/feed.jpg",
+      "bpm": 123,
+      "location": {
+        "lat": 52.352189,
+        "lon": 4.912238
+      }
+    },
+    {
+      "id": "wotsits",
+      "frequency": "96.70",
+      "title": "Wotsits",
+      "host": "JAJ",
+      "tags": [
+        "dub",
+        "techno",
+        "Trance"
+      ],
+      "signal": 1,
+      "track": "/media/audio/128k/wotsits.mp3",
+      "art": "/media/artwork/wotsits.jpg",
+      "location": {
+        "lat": 40.416611,
+        "lon": -3.702528
+      },
+      "bpm": 136
+    },
+    {
+      "id": "love",
+      "frequency": "97.20",
+      "title": "Love Hangover",
+      "host": "Jay Fontaine",
+      "tags": [
+        "House",
+        "strictly vinyl",
+        "disco",
+        "balearic"
+      ],
+      "signal": 4,
+      "track": "/media/audio/128k/love.mp3",
+      "art": "/media/artwork/love.jpg",
+      "location": {
+        "lat": 53.979194,
+        "lon": -1.522444
+      },
+      "bpm": 117.5
+    },
+    {
+      "id": "clemp",
+      "frequency": "98.00",
+      "title": "#19",
+      "host": "Clemp",
+      "tags": [
+        "techno",
+        "groovy",
+        "House"
+      ],
+      "coordinates": "",
+      "signal": 4,
+      "track": "/media/audio/128k/clemp.mp3",
+      "art": "/media/artwork/clemp.jpg",
+      "location": {
+        "lat": 45.464211,
+        "lon": 9.191383
+      },
+      "bpm": 129.2
+    },
+    {
+      "id": "jack",
+      "frequency": "101.30",
+      "title": "with some confidence",
+      "host": "Basement Jack",
+      "tags": [
+        "House",
+        "groovy",
+        "techno"
+      ],
+      "signal": 4,
+      "track": "/media/audio/128k/jack.mp3",
+      "art": "/media/artwork/jack.jpg",
+      "location": {
+        "lat": 52.370722,
+        "lon": 4.883583
+      },
+      "bpm": 129.2
+    },
+    {
+      "id": "sven",
+      "frequency": "102.20",
+      "title": "ClubNacht birthday bash",
+      "host": "Sven.fm",
+      "tags": [
+        "techno",
+        "Trance",
+        "house"
+      ],
+      "signal": 3,
+      "track": "/media/audio/128k/svenfm.mp3",
+      "art": "/media/artwork/svenfm.jpg",
+      "location": {
+        "lat": 35.57325,
+        "lon": 12.492389
+      },
+      "bpm": 129.2
+    },
+    {
+      "id": "mac",
+      "frequency": "103.33",
+      "title": "On Record",
+      "host": "Mac Keller jr.",
+      "tags": [
+        "house",
+        "deep House",
+        "tech House"
+      ],
+      "signal": 3,
+      "track": "/media/audio/128k/mac.mp3",
+      "art": "/media/artwork/mac.jpg",
+      "bpm": 123,
+      "location": {
+        "lat": 52.352006,
+        "lon": 4.91328
+      }
+    },
+    {
+      "id": "lonnnng",
+      "frequency": "104.80",
+      "title": "Lonnnng & Laaaate",
+      "host": "JAJ",
+      "tags": [
+        "House",
+        "dub",
+        "techno"
+      ],
+      "signal": 2,
+      "track": "/media/audio/128k/lonnnng.mp3",
+      "art": "/media/artwork/lonnnng.jpg",
+      "location": {
+        "lat": 59.3295,
+        "lon": 18.068639
+      },
+      "bpm": 129.2
+    },
+    {
+      "id": "for20",
+      "frequency": "105.05",
+      "title": "for20",
+      "host": "Sven.fm",
+      "tags": [
+        "House",
+        "disco",
+        "groovy"
+      ],
+      "signal": 3,
+      "track": "/media/audio/128k/for20.mp3",
+      "art": "/media/artwork/for20.jpg",
+      "location": {
+        "lat": 51.044231,
+        "lon": -0.29442
+      },
+      "bpm": 129.1
+    },
+    {
+      "id": "mix",
+      "frequency": "107.90",
+      "title": "Just a straight forward mix",
+      "host": "Jack Merrell",
+      "tags": [
+        "House",
+        "strictly vinyl",
+        "groovy"
+      ],
+      "signal": 3,
+      "track": "/media/audio/128k/mix.mp3",
+      "art": "/media/artwork/mix.jpg",
+      "location": {
+        "lat": 41.906694,
+        "lon": 12.492389
+      },
+      "bpm": 107.7
+    }
+  ]
+}

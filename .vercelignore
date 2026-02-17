@@ -1,0 +1,6 @@
+public/media/audio/original/
+media-originals/
+.git/
+node_modules/
+dist/
+.DS_Store
