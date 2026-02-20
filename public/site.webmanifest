@@ -1,7 +1,7 @@
 {
   "name": "offley.fm",
   "short_name": "offley.fm",
-  "description": "A live online radio dial where every listener tunes into the same moment.",
+  "description": "A live online radio where every listener tunes into the same moment.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

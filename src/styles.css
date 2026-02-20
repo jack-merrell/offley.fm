@@ -180,6 +180,12 @@ body {
   letter-spacing: 0.05em;
 }
 
+.panel-head-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .panel-clock {
   margin-top: 1px;
 }
@@ -191,6 +197,54 @@ body {
   gap: 3px;
   min-width: 28px;
   height: 10px;
+}
+
+.cast-button {
+  appearance: none;
+  margin: 0;
+  border: 1px solid #444;
+  border-radius: 999px;
+  background: #080808;
+  color: #b5b5b5;
+  font-family: 'PT Mono', monospace;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+  padding: 4px 8px;
+  height: 20px;
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 220ms ease,
+    opacity 180ms ease;
+}
+
+.cast-button:hover:not(:disabled) {
+  border-color: #7a7a7a;
+  color: #f2f2f2;
+}
+
+.cast-button:disabled {
+  opacity: 0.34;
+  cursor: default;
+}
+
+.cast-button-disabled {
+  border-color: #303030;
+  color: #6f6f6f;
+}
+
+.cast-button:focus,
+.cast-button:focus-visible {
+  outline: none;
+}
+
+.cast-button-active {
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 8px rgba(255, 138, 0, 0.34);
 }
 
 .signal-bar {

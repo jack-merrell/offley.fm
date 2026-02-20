@@ -18,6 +18,8 @@ const LOCAL_API_BASE = 'http://localhost:8787';
 const MOBILE_BREAKPOINT = 520;
 const STATION_TRANSITION_MS = 660;
 const STATION_TRANSITION_SWAP_MS = 360;
+const CAST_SDK_URL = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
+const CAST_LOCALHOST_FALLBACK_BASE_URL = 'https://offley.fm';
 const DIAL_TICKS = (() => {
   const ticks = [];
   for (let value = FM_MIN; value <= FM_MAX + 0.0001; value += FM_STEP) {
@@ -340,6 +342,13 @@ function App() {
   const untunedStaticGainRef = useRef(null);
   const untunedStaticHighPassRef = useRef(null);
   const untunedStaticLowPassRef = useRef(null);
+  const untunedStaticRequestRef = useRef(0);
+  const castContextRef = useRef(null);
+  const castSessionRef = useRef(null);
+  const castSessionStateHandlerRef = useRef(null);
+  const castLoadedStationKeyRef = useRef('');
+  const castLoadedMutedRef = useRef(null);
+  const isCastingRef = useRef(false);
   const dialDriftWrapRef = useRef(null);
   const dialDriftRafRef = useRef(null);
   const dialDriftPxRef = useRef(0);
@@ -384,6 +393,8 @@ function App() {
   const [shareStatus, setShareStatus] = useState('');
   const [isStationsPanelOpen, setIsStationsPanelOpen] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(() => window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches);
+  const [isCastSupported, setIsCastSupported] = useState(false);
+  const [isCasting, setIsCasting] = useState(false);
   const initialHashFrequencyRef = useRef(normalizeFrequencyHash(window.location.hash));
   const pendingInitialHashFrequencyRef = useRef(normalizeFrequencyHash(window.location.hash));
   const hasBootstrappedStationRef = useRef(false);
@@ -411,6 +422,10 @@ function App() {
   useEffect(() => {
     isUntunedRef.current = isUntuned;
   }, [isUntuned]);
+
+  useEffect(() => {
+    isCastingRef.current = isCasting;
+  }, [isCasting]);
 
   useEffect(() => {
     return () => {
@@ -446,6 +461,8 @@ function App() {
   }, []);
 
   function stopUntunedStatic() {
+    untunedStaticRequestRef.current += 1;
+
     const source = untunedStaticSourceRef.current;
     if (source) {
       try {
@@ -482,10 +499,18 @@ function App() {
     untunedStaticGainRef.current = null;
   }
 
+  function setUntunedState(nextUntuned) {
+    isUntunedRef.current = nextUntuned;
+    setIsUntuned(nextUntuned);
+  }
+
   async function startUntunedStatic() {
     if (untunedStaticSourceRef.current) {
       return;
     }
+
+    const requestId = untunedStaticRequestRef.current + 1;
+    untunedStaticRequestRef.current = requestId;
 
     const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextCtor) {
@@ -498,7 +523,7 @@ function App() {
       untunedStaticContextRef.current = context;
     }
 
-    if (context.state === 'suspended') {
+    if (context.state !== 'running') {
       try {
         await context.resume();
       } catch (_error) {
@@ -506,7 +531,7 @@ function App() {
       }
     }
 
-    if (!isUntunedRef.current || isMutedRef.current) {
+    if (requestId !== untunedStaticRequestRef.current || !isUntunedRef.current || isMutedRef.current) {
       return;
     }
 
@@ -538,6 +563,10 @@ function App() {
     highPass.connect(lowPass);
     lowPass.connect(gain);
     gain.connect(context.destination);
+
+    if (requestId !== untunedStaticRequestRef.current || !isUntunedRef.current || isMutedRef.current) {
+      return;
+    }
 
     source.start();
     const now = context.currentTime;
@@ -595,6 +624,109 @@ function App() {
       return { stationIndex: index, tickIndex };
     })
     .filter(Boolean);
+  const activeStationKey = activeStationHash || activeStation?.id || '';
+  const castUnsupportedReason = !window.isSecureContext ? 'Cast requires HTTPS or localhost.' : 'Cast is unavailable in this browser.';
+
+  function getCastMediaBaseUrl() {
+    const configured = String(import.meta.env.VITE_CAST_MEDIA_BASE_URL || '').trim();
+    if (configured) {
+      return configured;
+    }
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return CAST_LOCALHOST_FALLBACK_BASE_URL;
+    }
+    return window.location.origin;
+  }
+
+  function resolveCastAssetUrl(assetPath) {
+    if (!assetPath) {
+      return '';
+    }
+    try {
+      return new URL(assetPath, getCastMediaBaseUrl()).href;
+    } catch (_error) {
+      return '';
+    }
+  }
+
+  function getCastSdk() {
+    const castFramework = window.cast?.framework;
+    const chromeCast = window.chrome?.cast;
+    if (!castFramework || !chromeCast?.media) {
+      return null;
+    }
+    return { castFramework, chromeCast };
+  }
+
+  async function setCastPlaybackMuted(nextMuted) {
+    const sdk = getCastSdk();
+    const session = castSessionRef.current;
+    if (!sdk || !session) {
+      return;
+    }
+
+    const mediaSession = session.getMediaSession?.();
+    if (!mediaSession) {
+      return;
+    }
+
+    await new Promise((resolve, reject) => {
+      const onSuccess = () => resolve();
+      const onError = () => reject(new Error('Cast playback command failed.'));
+      if (nextMuted) {
+        const request = new sdk.chromeCast.media.PauseRequest();
+        mediaSession.pause(request, onSuccess, onError);
+      } else {
+        const request = new sdk.chromeCast.media.PlayRequest();
+        mediaSession.play(request, onSuccess, onError);
+      }
+    });
+  }
+
+  async function loadCastStationMedia(station, muted) {
+    const sdk = getCastSdk();
+    const session = castSessionRef.current;
+    if (!sdk || !session || !station?.track) {
+      return;
+    }
+
+    const mediaUrl = resolveCastAssetUrl(station.track);
+    if (!mediaUrl) {
+      throw new Error('Missing cast media URL.');
+    }
+    const mediaInfo = new sdk.chromeCast.media.MediaInfo(mediaUrl, 'audio/mpeg');
+    mediaInfo.streamType = sdk.chromeCast.media.StreamType.BUFFERED;
+
+    const metadata = new sdk.chromeCast.media.MusicTrackMediaMetadata();
+    metadata.title = station.title || 'offley.fm';
+    metadata.artist = station.host ? `Host: ${station.host}` : 'offley.fm';
+    metadata.albumName = Number.isFinite(Number.parseFloat(station.frequency))
+      ? `${Number.parseFloat(station.frequency).toFixed(2)} MHz`
+      : 'offley.fm';
+    if (station.art) {
+      const artworkUrl = resolveCastAssetUrl(station.art);
+      if (artworkUrl) {
+        metadata.images = [new sdk.chromeCast.Image(artworkUrl)];
+      }
+    }
+    mediaInfo.metadata = metadata;
+
+    const request = new sdk.chromeCast.media.LoadRequest(mediaInfo);
+    request.autoplay = !muted;
+
+    const audio = audioRef.current;
+    if (audio && Number.isFinite(audio.duration) && audio.duration > 0) {
+      request.currentTime = syncedOffset(audio.duration);
+    } else {
+      request.currentTime = 0;
+    }
+
+    await session.loadMedia(request);
+    if (!muted) {
+      await setCastPlaybackMuted(false);
+    }
+  }
 
   useEffect(() => {
     const media = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
@@ -609,6 +741,165 @@ function App() {
       setIsStationsPanelOpen(false);
     }
   }, [isMobileViewport, isStationsPanelOpen]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const initCast = () => {
+      if (cancelled) {
+        return;
+      }
+      const sdk = getCastSdk();
+      if (!sdk) {
+        return;
+      }
+
+      setIsCastSupported(true);
+      const castContext = sdk.castFramework.CastContext.getInstance();
+      castContextRef.current = castContext;
+      castContext.setOptions({
+        receiverApplicationId: sdk.chromeCast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+        autoJoinPolicy: sdk.chromeCast.AutoJoinPolicy.ORIGIN_SCOPED
+      });
+      castSessionRef.current = castContext.getCurrentSession?.() || null;
+      setIsCasting(Boolean(castSessionRef.current));
+
+      const existingSessionStateHandler = castSessionStateHandlerRef.current;
+      if (existingSessionStateHandler) {
+        castContext.removeEventListener(sdk.castFramework.CastContextEventType.SESSION_STATE_CHANGED, existingSessionStateHandler);
+        castSessionStateHandlerRef.current = null;
+      }
+
+      const onSessionStateChanged = (event) => {
+        const started =
+          event.sessionState === sdk.castFramework.SessionState.SESSION_STARTED ||
+          event.sessionState === sdk.castFramework.SessionState.SESSION_RESUMED;
+
+        if (started) {
+          castSessionRef.current = castContext.getCurrentSession();
+          setIsCasting(true);
+          stopUntunedStatic();
+          const audio = audioRef.current;
+          if (audio) {
+            audio.pause();
+            audio.muted = true;
+          }
+          return;
+        }
+
+        const ended =
+          event.sessionState === sdk.castFramework.SessionState.SESSION_ENDED ||
+          event.sessionState === sdk.castFramework.SessionState.SESSION_START_FAILED;
+
+        if (ended) {
+          castSessionRef.current = null;
+          castLoadedStationKeyRef.current = '';
+          castLoadedMutedRef.current = null;
+          setIsCasting(false);
+          const audio = audioRef.current;
+          if (audio) {
+            audio.muted = isMutedRef.current;
+            if (!isMutedRef.current && !isUntunedRef.current) {
+              void audio.play().catch(() => {
+                // Playback can remain blocked until next interaction.
+              });
+            }
+          }
+        }
+      };
+
+      castSessionStateHandlerRef.current = onSessionStateChanged;
+      castContext.addEventListener(sdk.castFramework.CastContextEventType.SESSION_STATE_CHANGED, onSessionStateChanged);
+    };
+
+    const previousCastApiHandler = window.__onGCastApiAvailable;
+    window.__onGCastApiAvailable = (isAvailable) => {
+      if (typeof previousCastApiHandler === 'function') {
+        previousCastApiHandler(isAvailable);
+      }
+      if (isAvailable) {
+        initCast();
+      }
+    };
+
+    if (getCastSdk()) {
+      initCast();
+    } else {
+      const sdkScript = document.querySelector(`script[src="${CAST_SDK_URL}"]`);
+      if (!sdkScript) {
+        const newScript = document.createElement('script');
+        newScript.src = CAST_SDK_URL;
+        newScript.async = true;
+        document.head.appendChild(newScript);
+      }
+    }
+
+    return () => {
+      cancelled = true;
+      if (typeof previousCastApiHandler === 'function') {
+        window.__onGCastApiAvailable = previousCastApiHandler;
+      } else {
+        delete window.__onGCastApiAvailable;
+      }
+      const castContext = castContextRef.current;
+      const sessionStateHandler = castSessionStateHandlerRef.current;
+      if (castContext && sessionStateHandler) {
+        const sdk = getCastSdk();
+        if (sdk) {
+          castContext.removeEventListener(sdk.castFramework.CastContextEventType.SESSION_STATE_CHANGED, sessionStateHandler);
+        }
+        castSessionStateHandlerRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isCasting) {
+      castLoadedStationKeyRef.current = '';
+      castLoadedMutedRef.current = null;
+      return;
+    }
+
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.muted = true;
+    }
+
+    let cancelled = false;
+    async function syncCast() {
+      if (isUntuned || !activeStation) {
+        return;
+      }
+
+      try {
+        if (castLoadedStationKeyRef.current !== activeStationKey) {
+          await loadCastStationMedia(activeStation, isMuted);
+          if (cancelled) {
+            return;
+          }
+          castLoadedStationKeyRef.current = activeStationKey;
+          castLoadedMutedRef.current = isMuted;
+          return;
+        }
+
+        if (castLoadedMutedRef.current !== isMuted) {
+          await setCastPlaybackMuted(isMuted);
+          if (cancelled) {
+            return;
+          }
+          castLoadedMutedRef.current = isMuted;
+        }
+      } catch (_error) {
+        // Keep local player state stable if cast command fails.
+      }
+    }
+
+    void syncCast();
+    return () => {
+      cancelled = true;
+    };
+  }, [isCasting, isUntuned, activeStation, activeStationKey, isMuted]);
 
   useEffect(() => {
     const previousSignal = previousSignalRef.current;
@@ -1077,7 +1368,7 @@ function App() {
 
     beginStationTransition(currentStation, station, currentIndex, index, stationList.length);
     stopUntunedStatic();
-    setIsUntuned(false);
+    setUntunedState(false);
     setActiveIndex(index);
 
     if (!audio) {
@@ -1087,6 +1378,11 @@ function App() {
     audio.pause();
     audio.src = station.track;
     audio.load();
+
+    if (isCastingRef.current) {
+      audio.muted = true;
+      return;
+    }
 
     try {
       await waitForMetadata(audio);
@@ -1180,13 +1476,13 @@ function App() {
     const requestedIndex = findStationIndexByFrequency(stations, initialHashFrequencyRef.current);
     if (requestedIndex >= 0) {
       pendingInitialHashFrequencyRef.current = null;
-      setIsUntuned(false);
+      setUntunedState(false);
       hasBootstrappedStationRef.current = true;
       void tuneToStation(requestedIndex, stations);
       return;
     }
     hasBootstrappedStationRef.current = true;
-    setIsUntuned(true);
+    setUntunedState(true);
   }, [stations]);
 
   function scan(delta) {
@@ -1273,11 +1569,18 @@ function App() {
 
   function toggleMute() {
     const audio = audioRef.current;
-    setMuted((prevMuted) => {
-      const nextMuted = !prevMuted;
-      isMutedRef.current = nextMuted;
+    const nextMuted = !isMutedRef.current;
+    isMutedRef.current = nextMuted;
+    setMuted(nextMuted);
 
-      if (audio) {
+    if (audio) {
+      if (isCastingRef.current && !isUntunedRef.current) {
+        audio.pause();
+        audio.muted = true;
+        void setCastPlaybackMuted(nextMuted).catch(() => {
+          // Keep mute state local if cast command fails.
+        });
+      } else {
         audio.muted = nextMuted;
         if (!nextMuted && audio.paused && !isUntunedRef.current) {
           void audio.play().catch(() => {
@@ -1285,17 +1588,15 @@ function App() {
           });
         }
       }
+    }
 
-      if (isUntunedRef.current) {
-        if (nextMuted) {
-          stopUntunedStatic();
-        } else {
-          void startUntunedStatic();
-        }
+    if (isUntunedRef.current) {
+      if (nextMuted) {
+        stopUntunedStatic();
+      } else {
+        void startUntunedStatic();
       }
-
-      return nextMuted;
-    });
+    }
   }
 
   async function copyStationUrl() {
@@ -1322,6 +1623,28 @@ function App() {
       } catch (_fallbackError) {
         setShareStatus('Copy failed');
       }
+    }
+  }
+
+  async function handleCastButtonClick() {
+    const context = castContextRef.current;
+    if (!context || !isCastSupported || isUntuned) {
+      return;
+    }
+
+    if (isCastingRef.current) {
+      try {
+        await context.endCurrentSession(true);
+      } catch (_error) {
+        // Ignore failed disconnect attempts.
+      }
+      return;
+    }
+
+    try {
+      await context.requestSession();
+    } catch (_error) {
+      // Request can be cancelled by user.
     }
   }
 
@@ -1412,14 +1735,25 @@ function App() {
           <section className="radio-panel">
           <header className="panel-head">
             <p className="panel-clock">{clock}</p>
-            <div className={`signal-bars signal-bars-${signalDirection}`} aria-label={`Signal strength ${activeSignalStrength} of ${SIGNAL_BAR_COUNT}`}>
-              {Array.from({ length: SIGNAL_BAR_COUNT }).map((_, index) => (
-                <span
-                  key={`signal-${index}`}
-                  className={index < activeSignalStrength ? 'signal-bar signal-bar-active' : 'signal-bar'}
-                  aria-hidden="true"
-                />
-              ))}
+            <div className="panel-head-tools">
+              <div className={`signal-bars signal-bars-${signalDirection}`} aria-label={`Signal strength ${activeSignalStrength} of ${SIGNAL_BAR_COUNT}`}>
+                {Array.from({ length: SIGNAL_BAR_COUNT }).map((_, index) => (
+                  <span
+                    key={`signal-${index}`}
+                    className={index < activeSignalStrength ? 'signal-bar signal-bar-active' : 'signal-bar'}
+                    aria-hidden="true"
+                  />
+                ))}
+              </div>
+              <button
+                type="button"
+                className={isCasting ? 'cast-button cast-button-active' : isCastSupported ? 'cast-button' : 'cast-button cast-button-disabled'}
+                onClick={handleCastButtonClick}
+                disabled={isUntuned || !isCastSupported}
+                title={isCastSupported ? 'Cast to speaker' : castUnsupportedReason}
+              >
+                {isCasting ? 'casting' : 'cast'}
+              </button>
             </div>
           </header>
 
