@@ -5,6 +5,7 @@ import os from 'os';
 import { spawn } from 'child_process';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
+import { normalizeStationTags } from '../shared/stationTags.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,18 +20,6 @@ const estimateBpmScript = path.join(repoRoot, 'scripts', 'estimate_bpm.py');
 const venvPython = path.join(repoRoot, '.venv', 'bin', 'python');
 const LISTENER_TTL_MS = 45000;
 const listenersByStation = new Map();
-const STATION_TAG_OPTIONS = [
-  'House',
-  'strictly vinyl',
-  'disco',
-  'techno',
-  'balearic',
-  'Ambient',
-  'dub',
-  'Trance',
-  'groovy'
-];
-const TAG_LOOKUP = new Map(STATION_TAG_OPTIONS.map((tag) => [tag.toLowerCase(), tag]));
 
 const upload = multer({
   dest: path.join(os.tmpdir(), 'offley-fm-uploads'),
@@ -86,38 +75,6 @@ function sanitizeId(input) {
 function ensureFiniteFrequency(value) {
   const parsed = Number.parseFloat(value);
   return Number.isFinite(parsed) ? parsed.toFixed(2) : null;
-}
-
-function normalizeTags(rawValue) {
-  let values = [];
-  if (Array.isArray(rawValue)) {
-    values = rawValue;
-  } else if (typeof rawValue === 'string') {
-    const trimmed = rawValue.trim();
-    if (!trimmed) {
-      return [];
-    }
-    try {
-      const parsed = JSON.parse(trimmed);
-      if (Array.isArray(parsed)) {
-        values = parsed;
-      } else {
-        values = trimmed.split(/[,\n]/g);
-      }
-    } catch (_error) {
-      values = trimmed.split(/[,\n]/g);
-    }
-  }
-
-  const deduped = new Set();
-  for (const value of values) {
-    const key = String(value || '').trim().toLowerCase();
-    if (!key || !TAG_LOOKUP.has(key) || deduped.has(key)) {
-      continue;
-    }
-    deduped.add(key);
-  }
-  return [...deduped].map((key) => TAG_LOOKUP.get(key));
 }
 
 function parseLocationFromInput(rawValue) {
@@ -465,8 +422,8 @@ app.post('/api/tune-station', upload.fields([{ name: 'audio', maxCount: 1 }, { n
     const manifest = await readManifest();
     const stations = Array.isArray(manifest.stations) ? manifest.stations : [];
 
-    const parsedTags = normalizeTags(req.body.tags);
-    const fallbackTags = normalizeTags(req.body.tag || req.body.pendingTag);
+    const parsedTags = normalizeStationTags(req.body.tags);
+    const fallbackTags = normalizeStationTags(req.body.tag || req.body.pendingTag);
 
     const upsertedStation = {
       id: stationId,

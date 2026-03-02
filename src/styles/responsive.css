@@ -1,0 +1,85 @@
+@media (max-width: 520px) {
+  body {
+    overflow-y: auto;
+  }
+
+  .app-shell {
+    min-height: 100svh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .panel-head {
+    display: none;
+  }
+
+  .disc-block {
+    margin: 20px 10px 20px;
+  }
+
+  .scan-row{
+    padding: 0px 10px 14px;
+  }
+
+  .radio-stage {
+    min-height: 100svh;
+    align-items: flex-start;
+    padding: 0;
+  }
+
+  .radio-stack {
+    width: 100vw;
+  }
+
+  .stations-drawer {
+    display: none;
+  }
+
+  .radio-panel {
+    width: 100vw;
+    min-height: 100svh;
+    height: auto;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .tune-toggle {
+    font-size: 34px;
+  }
+
+  .panel-foot {
+    padding: 10px 20px 10px;
+  }
+
+  .meta-block {
+    min-height: 108px;
+  }
+
+  .meta-block h1 {
+    font-size: 45px;
+  }
+
+  .host-key,
+  .host-value,
+  .freq-readout,
+  .coords {
+    font-size: 12px;
+  }
+
+  .tune-stage {
+    min-height: 100svh;
+    padding: 0;
+    align-items: flex-start;
+  }
+
+  .tune-panel {
+    width: 100vw;
+    min-height: 100svh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .tune-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -7,9 +7,9 @@
       "host": "Jay Fontaine",
       "tags": [
         "House",
-        "strictly vinyl",
-        "disco",
-        "groovy"
+        "Strictly Vinyl",
+        "Disco",
+        "Groovy"
       ],
       "signal": 4,
       "track": "/media/audio/128k/eves.mp3",
@@ -26,14 +26,14 @@
       "title": "VENICE 2.0",
       "host": "Claudio",
       "tags": [
-        "strictly vinyl",
-        "Ambient",
-        "House"
+        "House",
+        "Strictly Vinyl",
+        "Ambient"
       ],
       "signal": 4,
       "track": "/media/audio/128k/claudio.mp3",
       "art": "/media/artwork/claudio.jpg",
-          "location": {
+      "location": {
         "lat": 52.3784231,
         "lon": 4.9092013
       },
@@ -45,7 +45,7 @@
       "title": "EILAND GASTEN- 54",
       "host": "Superemre",
       "tags": [
-        "techno",
+        "Techno",
         "Trance"
       ],
       "signal": 2,
@@ -64,8 +64,8 @@
       "host": "JAJ",
       "tags": [
         "House",
-        "techno",
-        "dub"
+        "Techno",
+        "Dub"
       ],
       "signal": 2,
       "track": "/media/audio/128k/autumn.mp3",
@@ -83,8 +83,8 @@
       "host": "Bobby Turner",
       "tags": [
         "House",
-        "groovy",
-        "disco"
+        "Disco",
+        "Groovy"
       ],
       "signal": 3,
       "track": "/media/audio/128k/for15.mp3",
@@ -102,10 +102,10 @@
       "host": "Feed Your Ears Crew",
       "tags": [
         "House",
-        "techno",
-        "disco",
-        "groovy",
-        "Trance"
+        "Disco",
+        "Techno",
+        "Trance",
+        "Groovy"
       ],
       "signal": 3,
       "track": "/media/audio/128k/feed.mp3",
@@ -122,8 +122,8 @@
       "title": "Wotsits",
       "host": "JAJ",
       "tags": [
-        "dub",
-        "techno",
+        "Techno",
+        "Dub",
         "Trance"
       ],
       "signal": 1,
@@ -142,9 +142,9 @@
       "host": "Jay Fontaine",
       "tags": [
         "House",
-        "strictly vinyl",
-        "disco",
-        "balearic"
+        "Strictly Vinyl",
+        "Disco",
+        "Balearic"
       ],
       "signal": 4,
       "track": "/media/audio/128k/love.mp3",
@@ -161,9 +161,9 @@
       "title": "#19",
       "host": "Clemp",
       "tags": [
-        "techno",
-        "groovy",
-        "House"
+        "House",
+        "Techno",
+        "Groovy"
       ],
       "coordinates": "",
       "signal": 4,
@@ -182,8 +182,8 @@
       "host": "Basement Jack",
       "tags": [
         "House",
-        "groovy",
-        "techno"
+        "Techno",
+        "Groovy"
       ],
       "signal": 4,
       "track": "/media/audio/128k/jack.mp3",
@@ -200,9 +200,9 @@
       "title": "ClubNacht birthday bash",
       "host": "Sven.fm",
       "tags": [
-        "techno",
-        "Trance",
-        "house"
+        "House",
+        "Techno",
+        "Trance"
       ],
       "signal": 3,
       "track": "/media/audio/128k/svenfm.mp3",
@@ -219,9 +219,9 @@
       "title": "On Record",
       "host": "Mac Keller jr.",
       "tags": [
-        "house",
-        "deep House",
-        "tech House"
+        "House",
+        "Deep House",
+        "Tech House"
       ],
       "signal": 3,
       "track": "/media/audio/128k/mac.mp3",
@@ -239,8 +239,8 @@
       "host": "JAJ",
       "tags": [
         "House",
-        "dub",
-        "techno"
+        "Techno",
+        "Dub"
       ],
       "signal": 2,
       "track": "/media/audio/128k/lonnnng.mp3",
@@ -258,8 +258,8 @@
       "host": "Sven.fm",
       "tags": [
         "House",
-        "disco",
-        "groovy"
+        "Disco",
+        "Groovy"
       ],
       "signal": 3,
       "track": "/media/audio/128k/for20.mp3",
@@ -277,8 +277,8 @@
       "host": "Jack Merrell",
       "tags": [
         "House",
-        "strictly vinyl",
-        "groovy"
+        "Strictly Vinyl",
+        "Groovy"
       ],
       "signal": 3,
       "track": "/media/audio/128k/mix.mp3",

@@ -1,0 +1,428 @@
+.disc-block {
+  appearance: none;
+  display: block;
+  width: calc(100% - 22px);
+  border: 0;
+  background: transparent;
+  text-align: initial;
+  cursor: pointer;
+  position: relative;
+  margin: 20px 11px 16px;
+  padding: 0;
+  outline: none;
+}
+
+.disc-block:focus,
+.disc-block:focus-visible,
+.disc-block:focus-within {
+  outline: none;
+  box-shadow: none;
+}
+
+.disc-zone {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  clip-path: circle(50% at 50% 50%);
+  -webkit-clip-path: circle(50% at 50% 50%);
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  isolation: isolate;
+  border: 1px solid #262b3c;
+  transform: scale(1);
+  transition: transform 320ms ease, filter 320ms ease;
+}
+
+.disc-zone.switching {
+  box-shadow: 0 0 18px rgba(255, 138, 0, 0.22);
+}
+
+.disc-zone-untuned {
+  box-shadow: none;
+}
+
+.disc-motion {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  clip-path: circle(50% at 50% 50%);
+  -webkit-clip-path: circle(50% at 50% 50%);
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+.disc-motion-right {
+  animation: discMotionRight 660ms cubic-bezier(0.22, 0.9, 0.2, 1);
+}
+
+.disc-motion-left {
+  animation: discMotionLeft 660ms cubic-bezier(0.22, 0.9, 0.2, 1);
+}
+
+.disc-zone-muted {
+  transform: scale(0.8);
+  filter: grayscale(1) saturate(0.35) contrast(0.9);
+}
+
+.disc-zone-muted .disc-art {
+  filter: blur(5px);
+}
+
+.disc-zone-wake {
+  animation: discWake 520ms cubic-bezier(0.22, 1.12, 0.32, 1);
+}
+
+.disc-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translateZ(0) scale(1.02) rotate(var(--disc-rotation-start, 0deg));
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.disc-untuned-static {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 1;
+  contain: paint;
+  background:
+    radial-gradient(circle at 38% 34%, rgba(156, 181, 227, 0.2), transparent 48%),
+    radial-gradient(circle at 72% 64%, rgba(95, 112, 166, 0.2), transparent 52%),
+    linear-gradient(135deg, #0f1219 0%, #171b25 44%, #0c1018 100%);
+}
+
+.disc-untuned-shader {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: opacity;
+  opacity: 0.96;
+}
+
+.disc-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.8;
+  background-color: rgba(22, 26, 34, 0.2);
+  background-image:
+    linear-gradient(rgba(212, 226, 255, 0.12), rgba(212, 226, 255, 0.12)),
+    linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0, rgba(0, 0, 0, 0.2) 1px, transparent 1px, transparent 3px);
+  background-size:
+    auto,
+    2px 2px,
+    2px 2px,
+    100% 3px;
+  mix-blend-mode: hard-light;
+}
+
+.disc-glare {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.25;
+  mix-blend-mode: soft-light;
+}
+
+.disc-zone-muted .disc-overlay {
+  opacity: 0.96;
+  background-image:
+    linear-gradient(rgba(214, 224, 244, 0.2), rgba(214, 224, 244, 0.2)),
+    linear-gradient(to right, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.28) 0, rgba(0, 0, 0, 0.28) 1px, transparent 1px, transparent 4px);
+  background-size:
+    auto,
+    3px 3px,
+    3px 3px,
+    100% 4px;
+}
+
+.disc-zone-muted .disc-glare {
+  opacity: 0.68;
+}
+
+.disc-overlay-spin {
+  transform: translateZ(0);
+  transform-origin: center;
+  will-change: transform;
+  backface-visibility: hidden;
+  animation: discOverlaySpin 12s linear infinite;
+}
+
+.disc-in {
+  animation: discFadeIn 420ms ease-out;
+}
+
+.disc-in-pending {
+  opacity: 0;
+}
+
+.disc-hold {
+  opacity: 1;
+}
+
+.disc-out {
+  animation: discOut 500ms ease-out forwards;
+}
+
+.disc-spin {
+  animation: discSpin 12s linear infinite;
+}
+
+.disc-spin.disc-in {
+  animation: discFadeIn 420ms ease-out, discSpin 12s linear infinite;
+}
+
+.disc-core {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 100px;
+  height: 100px;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  border: 4px solid #f4f4f4;
+  background:
+    radial-gradient(circle, #212628 0 12px, #ebebea 13px 34px, #8f8f8f 35px 36px, #ebebea 37px 100%);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.7);
+}
+
+.disc-core-code {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-family: 'PT Mono', monospace;
+  font-size: 7px;
+  line-height: 0.95;
+  letter-spacing: 0;
+  color: #8f949f;
+  opacity: 0.86;
+  transform-origin: center;
+  transform: translate(-50%, -50%) rotate(var(--disc-rotation-start, 0deg)) translateY(-31px) rotate(-82deg);
+  animation: discCoreCodeSpin 12s linear infinite;
+  pointer-events: none;
+}
+
+.disc-core-code-static {
+  animation: none;
+}
+
+.mute-button {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  border-radius: 999px;
+  border: 1px solid #555;
+  background: rgba(10, 10, 10, 0.94);
+  color: #fff;
+  font-family: 'Times Now ExtraBold', serif;
+  font-size: 22px;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  height: 40px;
+  padding: 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  /* box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.4); */
+  z-index: 8;
+  transition:
+    width 420ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+  will-change: width;
+}
+
+.mute-button-muted {
+  width: 136px;
+}
+
+.mute-button-unmuted {
+  width: 112px;
+}
+
+.mute-icon-stack {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin-left: auto;
+}
+
+.mute-icon {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 18px;
+  height: 18px;
+  transition:
+    opacity 220ms ease,
+    transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.mute-icon-muted {
+  opacity: 0;
+  transform: translateY(1px) scale(0.9);
+}
+
+.mute-icon-unmuted {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.mute-button-muted .mute-icon-muted {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.mute-button-muted .mute-icon-unmuted {
+  opacity: 0;
+  transform: translateY(1px) scale(0.9);
+}
+
+.mute-button-unmuted .mute-icon-muted {
+  opacity: 0;
+  transform: translateY(1px) scale(0.9);
+}
+
+.mute-button-unmuted .mute-icon-unmuted {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.mute-button-muted .mute-icon-stack,
+.mute-button-unmuted .mute-icon-stack {
+  animation: muteIconJump 280ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.mute-label {
+  display: inline-block;
+  transform: translateY(1px);
+}
+
+
+@keyframes discFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes discOut {
+  from {
+    opacity: 1;
+    transform: translateZ(0) scale(1.02) rotate(var(--disc-rotation-start, 0deg));
+  }
+  to {
+    opacity: 0;
+    transform: translateZ(0) scale(0.98) rotate(var(--disc-rotation-start, 0deg));
+  }
+}
+
+@keyframes discCoreCodeSpin {
+  from {
+    transform: translate(-50%, -50%) rotate(var(--disc-rotation-start, 0deg)) translateY(-31px) rotate(-82deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(calc(var(--disc-rotation-start, 0deg) + 1turn)) translateY(-31px) rotate(-82deg);
+  }
+}
+
+@keyframes discMotionRight {
+  0% {
+    transform: translateX(0);
+  }
+  55% {
+    transform: translateX(100px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes discMotionLeft {
+  0% {
+    transform: translateX(0);
+  }
+  55% {
+    transform: translateX(-100px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes discSpin {
+  from {
+    transform: translateZ(0) scale(1.02) rotate(var(--disc-rotation-start, 0deg));
+  }
+  to {
+    transform: translateZ(0) scale(1.02) rotate(calc(var(--disc-rotation-start, 0deg) + 1turn));
+  }
+}
+
+@keyframes discOverlaySpin {
+  from {
+    transform: translateZ(0) rotate(0turn);
+  }
+  to {
+    transform: translateZ(0) rotate(1turn);
+  }
+}
+
+@keyframes muteIconJump {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    transform: translateY(-4px) scale(1.06);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes discWake {
+  0% {
+    transform: scale(0.93);
+    filter: grayscale(1) saturate(0.35) contrast(0.9);
+  }
+  55% {
+    transform: scale(1.02);
+    filter: grayscale(0.1) saturate(0.95) contrast(0.98);
+  }
+  100% {
+    transform: scale(1);
+    filter: grayscale(0) saturate(1) contrast(1);
+  }
+}

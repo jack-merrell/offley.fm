@@ -3,6 +3,8 @@ import StationsListPanel from './StationsListPanel';
 import { normalizeStationTags } from './stationTags';
 import { MUTE_STORAGE_KEY, RETURN_FROM_ALL_STATIONS_KEY } from './playbackStorage';
 import UntunedStaticDisc from './UntunedStaticDisc';
+import useStationsManifest from './hooks/useStationsManifest';
+import { findStationIndexByFrequency } from './stationsManifest';
 
 const SECONDS_PER_DAY = 86400;
 const MANIFEST_POLL_MS = 30000;
@@ -118,36 +120,6 @@ function clockLabel() {
   }).format(new Date());
 }
 
-function normalizeManifestStations(manifestStations) {
-  if (!Array.isArray(manifestStations)) {
-    return null;
-  }
-  const merged = manifestStations
-    .map((station) => ({
-      ...station,
-      tags: normalizeStationTags(station?.tags)
-    }))
-    .filter((station) => station.id && station.track && station.art && station.frequency && station.title)
-    .sort((a, b) => {
-      const aFreq = Number.parseFloat(a.frequency);
-      const bFreq = Number.parseFloat(b.frequency);
-      if (Number.isFinite(aFreq) && Number.isFinite(bFreq) && aFreq !== bFreq) {
-        return aFreq - bFreq;
-      }
-      return String(a.id).localeCompare(String(b.id));
-    });
-
-  return merged.length > 0 ? merged : null;
-}
-
-function hasLiveAssetChange(prevStation, nextStation) {
-  if (!prevStation || !nextStation) {
-    return false;
-  }
-
-  return prevStation.track !== nextStation.track || prevStation.art !== nextStation.art;
-}
-
 function normalizeFrequencyHash(hashValue) {
   if (!hashValue) {
     return null;
@@ -162,19 +134,6 @@ function normalizeFrequencyHash(hashValue) {
     return null;
   }
   return parsed.toFixed(2);
-}
-
-function findStationIndexByFrequency(stationList, targetFrequencyString) {
-  if (!targetFrequencyString || !Array.isArray(stationList) || stationList.length === 0) {
-    return -1;
-  }
-  return stationList.findIndex((station) => {
-    const parsed = Number.parseFloat(station.frequency);
-    if (!Number.isFinite(parsed)) {
-      return false;
-    }
-    return parsed.toFixed(2) === targetFrequencyString;
-  });
 }
 
 function normalizeSignalStrength(signalValue) {
@@ -1396,78 +1355,17 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    let stopped = false;
-
-    async function refreshManifest() {
-      try {
-        const response = await fetch(`/media/stations.json?t=${Date.now()}`, { cache: 'no-store' });
-        if (!response.ok) {
-          return;
-        }
-
-        const manifest = await response.json();
-        const incomingStations = normalizeManifestStations(manifest.stations);
-        if (!incomingStations || stopped) {
-          return;
-        }
-
-        const currentStations = stationsRef.current;
-        const currentActiveIndex = activeIndexRef.current;
-        const currentActiveStation = isUntunedRef.current ? null : currentStations[currentActiveIndex];
-        const pendingHashFrequency = pendingInitialHashFrequencyRef.current;
-
-        if (pendingHashFrequency) {
-          const hashedIndex = findStationIndexByFrequency(incomingStations, pendingHashFrequency);
-          if (hashedIndex >= 0) {
-            pendingInitialHashFrequencyRef.current = null;
-            setStations(incomingStations);
-            setIsManifestHydrated(true);
-            void tuneToStation(hashedIndex, incomingStations);
-            return;
-          }
-        }
-
-        if (!currentActiveStation) {
-          setStations(incomingStations);
-          setIsManifestHydrated(true);
-          return;
-        }
-
-        const currentFrequency = Number.parseFloat(currentActiveStation.frequency);
-        const normalizedCurrentFrequency = Number.isFinite(currentFrequency) ? currentFrequency.toFixed(2) : null;
-        const nextActiveIndex =
-          findStationIndexByFrequency(incomingStations, normalizedCurrentFrequency) >= 0
-            ? findStationIndexByFrequency(incomingStations, normalizedCurrentFrequency)
-            : incomingStations.findIndex((station) => station.id === currentActiveStation.id);
-        const resolvedActiveIndex = nextActiveIndex >= 0 ? nextActiveIndex : 0;
-        const nextActiveStation = incomingStations[resolvedActiveIndex];
-        const changedWhileLive = hasLiveAssetChange(currentActiveStation, nextActiveStation);
-
-        setStations(incomingStations);
-        setIsManifestHydrated(true);
-        if (resolvedActiveIndex !== currentActiveIndex) {
-          setActiveIndex(resolvedActiveIndex);
-        }
-
-        if (changedWhileLive) {
-          void tuneToStation(resolvedActiveIndex, incomingStations);
-        }
-      } catch (_error) {
-        // Ignore polling errors to keep playback uninterrupted.
-      }
-    }
-
-    void refreshManifest();
-    const intervalId = window.setInterval(() => {
-      void refreshManifest();
-    }, MANIFEST_POLL_MS);
-
-    return () => {
-      stopped = true;
-      window.clearInterval(intervalId);
-    };
-  }, []);
+  useStationsManifest({
+    pollMs: MANIFEST_POLL_MS,
+    stationsRef,
+    activeIndexRef,
+    isUntunedRef,
+    pendingInitialHashFrequencyRef,
+    setStations,
+    setActiveIndex,
+    setIsManifestHydrated,
+    tuneToStation
+  });
 
   useEffect(() => {
     if (hasBootstrappedStationRef.current || stations.length === 0) {

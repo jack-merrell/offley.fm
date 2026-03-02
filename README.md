@@ -17,6 +17,19 @@ Station definitions are in `/public/media/stations.json`.
 When you swap a track/art file, update that station's `track`/`art` path in `stations.json`.
 The app polls this manifest every 30 seconds and will hot-retune live listeners when it detects a path change.
 
+## Station tag policy
+Canonical station tags are defined once in `shared/stationTags.js` and used by both frontend and backend.
+
+- Use canonical tags when editing `public/media/stations.json`.
+- Legacy variants are automatically aliased (for example `house` -> `House`, `vinyl only` -> `Strictly Vinyl`).
+- Unknown non-empty tags are preserved and normalized instead of dropped.
+
+Commands:
+```bash
+npm run tags:normalize
+npm run tags:check
+```
+
 ## Run
 ```bash
 npm install

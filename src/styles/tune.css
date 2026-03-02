@@ -1,0 +1,185 @@
+.tune-shell {
+  overflow: auto;
+}
+
+.tune-stage {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+}
+
+.tune-panel {
+  height: 874px;
+  width: min(404px, 96vw);
+  border: 1px solid #444;
+  border-radius: 60px;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tune-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 18px 20px;
+}
+
+.tune-head p,
+.tune-head a {
+  margin: 0;
+  color: #f2f2f2;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+
+.tune-head p {
+  font-family: 'Times Now ExtraBold', serif;
+  font-size: 28px;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+
+.tune-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.tune-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9f9f9f;
+}
+
+.tune-form input,
+.tune-form select,
+.tune-form textarea {
+  width: 100%;
+  border: 1px solid #313131;
+  background: #0a0a0a;
+  color: #f2f2f2;
+  border-radius: 8px;
+  font-family: 'PT Mono', monospace;
+  font-size: 13px;
+  line-height: 1.3;
+  padding: 10px 11px;
+}
+
+.tune-form textarea {
+  resize: vertical;
+  min-height: 64px;
+}
+
+.tag-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.tag-add {
+  appearance: none;
+  border: 1px solid #3f2a0f;
+  border-radius: 8px;
+  background: #110800;
+  color: #ff8a00;
+  font-family: 'PT Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.tag-chip-list {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-chip {
+  appearance: none;
+  border: 1px solid #4c3716;
+  border-radius: 999px;
+  background: #140b00;
+  color: #ff8a00;
+  font-family: 'PT Mono', monospace;
+  font-size: 10px;
+  line-height: 1;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.tag-chip-empty {
+  border-color: #2b2b2b;
+  color: #7e7e7e;
+  background: #090909;
+  cursor: default;
+}
+
+.tune-grid {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 10px;
+}
+
+.tune-grid-equal {
+  grid-template-columns: 1fr 1fr;
+}
+
+.tune-submit {
+  appearance: none;
+  border: 1px solid #5b1e00;
+  border-radius: 999px;
+  background: #130700;
+  color: #ff8a00;
+  font-family: 'Times Now ExtraBold', serif;
+  font-size: 24px;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  padding: 13px 18px 10px;
+  cursor: pointer;
+}
+
+.tune-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.tune-progress {
+  margin: -4px 0 0;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: #ff8a00;
+}
+
+.tune-ok,
+.tune-error {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
+.tune-ok {
+  color: #ff8a00;
+}
+
+.tune-error {
+  color: #ff5b5b;
+}
+

@@ -7,7 +7,10 @@
     "dev": "vite",
     "admin-api": "node server/admin-api.mjs",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tags:normalize": "node scripts/normalize_station_tags.mjs",
+    "tags:check": "node scripts/check_station_tags.mjs",
+    "test:unit": "node --test tests/**/*.test.mjs"
   },
   "dependencies": {
     "express": "^4.21.2",
