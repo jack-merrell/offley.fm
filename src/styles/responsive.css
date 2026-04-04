@@ -44,6 +44,8 @@
     height: auto;
     border: 0;
     border-radius: 0;
+    padding-top: constant(safe-area-inset-top);
+    padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
@@ -56,7 +58,7 @@
   }
 
   .meta-block {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 14px);
+    padding-top: 22px;
     min-height: 108px;
   }
 
