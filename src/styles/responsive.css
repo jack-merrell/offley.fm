@@ -4,6 +4,7 @@
   }
 
   .app-shell {
+    min-height: 100dvh;
     min-height: 100svh;
     overflow-x: hidden;
     overflow-y: auto;
@@ -22,6 +23,7 @@
   }
 
   .radio-stage {
+    min-height: 100dvh;
     min-height: 100svh;
     align-items: flex-start;
     padding: 0;
@@ -37,10 +39,12 @@
 
   .radio-panel {
     width: 100vw;
+    min-height: 100dvh;
     min-height: 100svh;
     height: auto;
     border: 0;
     border-radius: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .tune-toggle {
@@ -52,6 +56,7 @@
   }
 
   .meta-block {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 14px);
     min-height: 108px;
   }
 
